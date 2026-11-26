@@ -64,12 +64,26 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tambah Foto Produk</label>
+                    @php
+                        $storedProductImages = $product->images->filter(fn ($image) => Storage::disk('public')->exists($image->image_path));
+                        $missingProductImageCount = $product->images->count() - $storedProductImages->count();
+                    @endphp
                     @if($product->images->isNotEmpty())
                     <div class="mb-3 grid grid-cols-3 sm:grid-cols-4 gap-3">
                         @foreach($product->images as $image)
-                        <img src="{{ Storage::disk('public')->url($image->image_path) }}" alt="{{ $product->name }}" class="h-24 w-full rounded-lg border border-slate-200 object-cover">
+                        <div class="overflow-hidden rounded-lg border border-slate-200">
+                            @if(Storage::disk('public')->exists($image->image_path))
+                            <img src="{{ Storage::disk('public')->url($image->image_path) }}" alt="{{ $image->alt_text ?: $product->name }}" class="h-24 w-full object-cover" loading="lazy">
+                            @else
+                            <div class="h-24 flex items-center justify-center bg-slate-50 px-2 text-center text-xs text-amber-700">File foto hilang</div>
+                            @endif
+                            <button type="submit" form="delete-product-image-{{ $image->id }}" onclick="return confirm('Hapus foto ini dari produk?')" class="w-full border-t border-slate-200 px-2 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">Hapus foto</button>
+                        </div>
                         @endforeach
                     </div>
+                    @endif
+                    @if($missingProductImageCount > 0)
+                    <p class="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">{{ $missingProductImageCount }} file foto hilang. Hapus entri foto yang rusak atau unggah ulang.</p>
                     @endif
                     <input type="file" name="images[]" multiple accept="image/jpeg,image/png,image/webp" data-image-preview="admin-product-edit-preview" class="w-full text-sm text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     <div id="admin-product-edit-preview" class="hidden mt-3 grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
@@ -93,6 +107,12 @@
                 <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white font-semibold text-sm rounded-xl hover:bg-blue-700 transition-colors">Simpan Perubahan</button>
             </div>
         </form>
+        @foreach($product->images as $image)
+        <form id="delete-product-image-{{ $image->id }}" action="{{ route('admin.produk.gambar.destroy', [$product, $image]) }}" method="POST" class="hidden">
+            @csrf
+            @method('DELETE')
+        </form>
+        @endforeach
     </div>
 </div>
 @endsection

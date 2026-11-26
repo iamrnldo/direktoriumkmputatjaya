@@ -23,7 +23,7 @@
             </span>
         </div>
 
-        <form action="{{ route('admin.umkm.update', $umkm) }}" method="POST">
+        <form action="{{ route('admin.umkm.update', $umkm) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -38,6 +38,26 @@
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nama Pemilik <span class="text-red-500">*</span></label>
                     <input type="text" name="owner_name" value="{{ old('owner_name', $umkm->owner_name) }}" required
                         class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">NIK Pemilik (rahasia)</label>
+                    <input type="text" name="owner_nik" value="{{ old('owner_nik', $umkm->owner_nik) }}" inputmode="numeric" maxlength="16" pattern="[0-9]{16}" autocomplete="off"
+                        class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="16 digit angka">
+                    @error('owner_nik')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">RT Pemilik</label>
+                        <input type="text" name="owner_rt" value="{{ old('owner_rt', $umkm->owner_rt) }}" inputmode="numeric" maxlength="3" pattern="[0-9]{1,3}"
+                            class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="001">
+                        @error('owner_rt')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">RW Pemilik</label>
+                        <input type="text" name="owner_rw" value="{{ old('owner_rw', $umkm->owner_rw) }}" inputmode="numeric" maxlength="3" pattern="[0-9]{1,3}"
+                            class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="005">
+                        @error('owner_rw')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                    </div>
                 </div>
 
                 <div>
@@ -96,6 +116,20 @@
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">Deskripsi Usaha</label>
                     <textarea name="business_description" rows="4" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none">{{ old('business_description', $umkm->business_description) }}</textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Foto Galeri UMKM</label>
+                    @if($umkm->images->isNotEmpty())
+                    <div class="mb-3 grid grid-cols-3 sm:grid-cols-4 gap-3">
+                        @foreach($umkm->images as $image)
+                        <img src="{{ Storage::disk('public')->url($image->image_path) }}" alt="{{ $umkm->name }}" class="h-24 w-full rounded-lg border border-slate-200 object-cover">
+                        @endforeach
+                    </div>
+                    @endif
+                    <input type="file" name="images[]" multiple accept="image/jpeg,image/png,image/webp" data-image-preview="admin-umkm-image-preview" class="w-full text-sm text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <div id="admin-umkm-image-preview" class="hidden mt-3 grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+                    <p class="mt-1 text-xs text-slate-400">JPG, PNG, WEBP · Maks. 5 MB per foto · Maks. 10 foto</p>
                 </div>
 
                 <div class="md:col-span-2 flex items-center gap-4">

@@ -32,11 +32,32 @@ class Event extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($model) {
-            if (empty($model->slug)) {
-                $model->slug = Str::slug($model->title);
+            $model->slug = $model->makeUniqueSlug($model->title);
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('title')) {
+                $model->slug = $model->makeUniqueSlug($model->title, $model->getKey());
             }
         });
+    }
+
+    protected function makeUniqueSlug(string $title, int|string|null $ignoreId = null): string
+    {
+        $base = Str::slug($title) ?: 'event';
+        $candidate = $base;
+        $suffix = 2;
+
+        while (static::withTrashed()
+            ->where('slug', $candidate)
+            ->when($ignoreId !== null, fn ($query) => $query->where($this->getKeyName(), '<>', $ignoreId))
+            ->exists()) {
+            $candidate = $base . '-' . $suffix++;
+        }
+
+        return $candidate;
     }
 
     public function creator(): BelongsTo
@@ -51,7 +72,11 @@ class Event extends Model
 
     public function scopeUpcoming($query)
     {
-        return $query->where('event_date', '>=', now())->orderBy('event_date');
+        // event_date is stored at midnight while start/end time live in separate columns.
+        // Keep today's events visible for the full calendar day and hide only past dates.
+        return $query->whereDate('event_date', '>=', now()->toDateString())
+            ->orderBy('event_date')
+            ->orderBy('start_time');
     }
 
     public function getRouteKeyName(): string

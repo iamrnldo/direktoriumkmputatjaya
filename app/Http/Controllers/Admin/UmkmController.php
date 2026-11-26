@@ -10,6 +10,7 @@ use App\Models\UmkmProfile;
 use App\Services\UmkmService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class UmkmController extends Controller
 {
@@ -57,15 +58,22 @@ class UmkmController extends Controller
 
     public function store(UmkmProfileRequest $request)
     {
+        $request->validate([
+            'verification_status' => ['nullable', Rule::in(['draft', 'diajukan', 'perlu_revisi', 'terverifikasi', 'aktif', 'ditolak', 'nonaktif'])],
+        ]);
+
         $data = $request->validated();
         $data['created_by'] = Auth::id();
         $data['verification_status'] = $request->input('verification_status', 'draft');
         $data['is_active'] = $data['verification_status'] === 'aktif';
 
         $umkm = $this->umkmService->create($data);
+        if ($request->hasFile('images')) {
+            $this->umkmService->uploadImages($umkm, $request->file('images'));
+        }
 
         return redirect()->route('admin.umkm.show', $umkm)
-            ->with('success', 'Data UMKM berhasil ditambahkan.');
+            ->with('success', 'Data UMKM dan foto berhasil ditambahkan.');
     }
 
     public function show(UmkmProfile $umkm)
@@ -83,13 +91,23 @@ class UmkmController extends Controller
 
     public function update(UmkmProfileRequest $request, UmkmProfile $umkm)
     {
-        $data = $request->validated();
+        $adminFields = $request->validate([
+            'verification_status' => ['nullable', Rule::in(['draft', 'diajukan', 'perlu_revisi', 'terverifikasi', 'aktif', 'ditolak', 'nonaktif'])],
+            'is_featured' => ['nullable', 'boolean'],
+            'is_active' => ['nullable', 'boolean'],
+        ]);
+        $data = array_merge($request->validated(), $adminFields);
+        $data['is_featured'] = $request->boolean('is_featured');
+        $data['is_active'] = $request->boolean('is_active');
         $data['updated_by'] = Auth::id();
 
         $this->umkmService->update($umkm, $data);
+        if ($request->hasFile('images')) {
+            $this->umkmService->uploadImages($umkm, $request->file('images'));
+        }
 
         return redirect()->route('admin.umkm.show', $umkm)
-            ->with('success', 'Data UMKM berhasil diperbarui.');
+            ->with('success', 'Data UMKM dan foto berhasil diperbarui.');
     }
 
     public function destroy(UmkmProfile $umkm)

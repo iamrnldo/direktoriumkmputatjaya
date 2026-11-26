@@ -7,14 +7,18 @@ use App\Models\UmkmProfile;
 
 class MapService
 {
-    public function getGeoJson(): array
+    public function getGeoJson(bool $includeInactive = false): array
     {
-        $umkmList = UmkmProfile::active()
-            ->withValidCoordinates()
+        $query = UmkmProfile::query()->withValidCoordinates();
+        if (! $includeInactive) {
+            $query->active();
+        }
+
+        $umkmList = $query
             ->with(['category', 'images' => fn($q) => $q->where('is_cover', true)])
             ->get();
 
-        $features = $umkmList->map(function (UmkmProfile $umkm) {
+        $features = $umkmList->map(function (UmkmProfile $umkm) use ($includeInactive) {
             return [
                 'type' => 'Feature',
                 'geometry' => [
@@ -31,7 +35,8 @@ class MapService
                     'address' => $umkm->address,
                     'whatsapp_link' => $umkm->whatsapp_link,
                     'cover_image' => $umkm->cover_image_url,
-                    'profile_url' => route('umkm.show', $umkm->slug),
+                    'profile_url' => $includeInactive ? route('admin.umkm.show', $umkm) : route('umkm.show', $umkm->slug),
+                    'verification_status' => $includeInactive ? $umkm->verification_status : null,
                     'is_featured' => $umkm->is_featured,
                     'is_open' => $umkm->isOpenNow(),
                 ],

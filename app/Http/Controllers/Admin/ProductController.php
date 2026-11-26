@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
+use App\Models\ProductImage;
 use App\Models\UmkmProfile;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
@@ -77,6 +78,15 @@ class ProductController extends Controller
     {
         $this->productService->softDelete($produk);
         return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil dihapus.');
+    }
+
+    public function deleteImage(Product $produk, ProductImage $image)
+    {
+        abort_unless($image->product_id === $produk->id, 404);
+
+        $this->productService->deleteImage($image);
+
+        return back()->with('success', 'Foto produk berhasil dihapus.');
     }
 
     public function toggleFeatured(Product $product)

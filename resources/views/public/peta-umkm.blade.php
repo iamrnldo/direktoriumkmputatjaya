@@ -22,15 +22,21 @@
 
 {{-- Category filter bar --}}
 <div class="bg-white border-b border-gray-100 px-4 py-3">
-    <div class="max-w-7xl mx-auto flex items-center space-x-2 overflow-x-auto pb-1">
-        <button class="filter-cat-btn flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white transition-colors" data-cat="all">Semua</button>
-        @if(isset($categories))
-        @foreach($categories as $cat)
-        <button class="filter-cat-btn flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors" data-cat="{{ $cat->slug }}">
-            {{ $cat->icon ?? '' }} {{ $cat->name }}
-        </button>
-        @endforeach
-        @endif
+    <div class="max-w-7xl mx-auto">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2">
+            <button class="filter-cat-btn flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium bg-blue-600 text-white transition-colors" data-cat="all">Semua</button>
+            @if(isset($categories))
+            @foreach($categories as $cat)
+            <button class="filter-cat-btn flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-700 transition-colors" data-cat="{{ $cat->slug }}" data-category-name="{{ $cat->name }}" data-marker-color="{{ $cat->marker_color }}">
+                {{ $cat->icon ?? '' }} {{ $cat->name }}
+            </button>
+            @endforeach
+            @endif
+        </div>
+        <div class="flex items-center gap-x-4 gap-y-2 flex-wrap pt-1" aria-label="Legenda warna kategori peta">
+            <span class="text-xs font-bold text-slate-500">Legenda warna:</span>
+            <div id="category-legend" class="flex items-center gap-x-4 gap-y-2 flex-wrap"></div>
+        </div>
     </div>
 </div>
 
@@ -66,9 +72,30 @@ function createColoredIcon(color) {
 
 const colorMap = {
     'blue': '#2563eb', 'green': '#16a34a', 'red': '#dc2626',
-    'orange': '#ea580c', 'purple': '#9333ea', 'teal': '#2563eb',
-    'yellow': '#d97706', 'pink': '#db2777', 'gray': '#4b5563'
+    'orange': '#ea580c', 'purple': '#9333ea', 'teal': '#0f766e',
+    'yellow': '#d97706', 'pink': '#db2777', 'gray': '#4b5563',
+    'cyan': '#0891b2', 'darkgreen': '#15803d'
 };
+
+function resolveMarkerColor(value) {
+    if (colorMap[value]) return colorMap[value];
+    return /^#[0-9a-f]{6}$/i.test(value || '') ? value : '#2563eb';
+}
+
+// Build the legend from the same category filters and color resolver as map markers.
+const legend = document.getElementById('category-legend');
+document.querySelectorAll('.filter-cat-btn[data-category-name]').forEach(button => {
+    const item = document.createElement('span');
+    item.className = 'inline-flex items-center gap-1.5 text-xs text-slate-700 whitespace-nowrap';
+    const swatch = document.createElement('span');
+    swatch.className = 'inline-block h-3 w-3 rounded-full border-2 border-white shadow ring-1 ring-slate-200';
+    swatch.style.backgroundColor = resolveMarkerColor(button.dataset.markerColor);
+    swatch.setAttribute('aria-hidden', 'true');
+    const name = document.createElement('span');
+    name.textContent = button.dataset.categoryName;
+    item.append(swatch, name);
+    legend.appendChild(item);
+});
 
 async function loadMarkers() {
     try {
@@ -78,7 +105,7 @@ async function loadMarkers() {
         data.features.forEach(feature => {
             const { coordinates } = feature.geometry;
             const p = feature.properties;
-            const color = colorMap[p.marker_color] || '#2563eb';
+            const color = resolveMarkerColor(p.marker_color);
 
             const marker = L.marker([coordinates[1], coordinates[0]], {
                 icon: createColoredIcon(color)

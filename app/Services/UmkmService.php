@@ -24,11 +24,14 @@ class UmkmService
             $slug = $this->generateUniqueSlug($data['name']);
 
             $profile = UmkmProfile::create([
-                'user_id' => $userId ?? Auth::id(),
+                'user_id' => $userId,
                 'category_id' => $data['category_id'],
                 'name' => $data['name'],
                 'slug' => $slug,
                 'owner_name' => $data['owner_name'],
+                'owner_nik' => $data['owner_nik'] ?? null,
+                'owner_rt' => $data['owner_rt'] ?? null,
+                'owner_rw' => $data['owner_rw'] ?? null,
                 'business_description' => $data['business_description'] ?? null,
                 'address' => $data['address'],
                 'village' => $data['village'] ?? 'Putat Jaya',
@@ -47,9 +50,9 @@ class UmkmService
                 'marketplace_url' => $data['marketplace_url'] ?? null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
-                'verification_status' => UmkmProfile::STATUS_DRAFT,
-                'is_featured' => false,
-                'is_active' => false,
+                'verification_status' => $data['verification_status'] ?? UmkmProfile::STATUS_DRAFT,
+                'is_featured' => (bool) ($data['is_featured'] ?? false),
+                'is_active' => (bool) ($data['is_active'] ?? (($data['verification_status'] ?? UmkmProfile::STATUS_DRAFT) === UmkmProfile::STATUS_AKTIF)),
                 'created_by' => Auth::id(),
                 'updated_by' => Auth::id(),
             ]);
@@ -65,6 +68,8 @@ class UmkmService
 
     public function update(UmkmProfile $profile, array $data): UmkmProfile
     {
+        unset($data['images']);
+
         return DB::transaction(function () use ($profile, $data) {
             $old = $profile->toArray();
 

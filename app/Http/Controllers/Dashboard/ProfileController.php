@@ -25,6 +25,9 @@ class ProfileController extends Controller
     public function store(UmkmProfileRequest $request)
     {
         $umkm = $this->umkmService->create($request->validated(), Auth::id());
+        if ($request->hasFile('images')) {
+            $this->umkmService->uploadImages($umkm, $request->file('images'));
+        }
 
         return redirect()->route('dashboard.profil-usaha')
             ->with('success', 'Profil usaha berhasil dibuat! Silakan lengkapi data dan ajukan verifikasi.');
@@ -38,6 +41,9 @@ class ProfileController extends Controller
         $this->authorize('update', $umkm);
 
         $this->umkmService->update($umkm, $request->validated());
+        if ($request->hasFile('images')) {
+            $this->umkmService->uploadImages($umkm, $request->file('images'));
+        }
 
         return redirect()->route('dashboard.profil-usaha')
             ->with('success', 'Profil usaha berhasil diperbarui.');

@@ -132,16 +132,7 @@
                 </p>
             </div>
 
-            {{-- Info box --}}
-            <div class="mb-6 p-4 rounded-xl border border-blue-100 bg-blue-50 flex items-start space-x-3">
-                <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-blue-800">Langsung aktif setelah mendaftar</p>
-                    <p class="text-xs text-blue-700 mt-0.5">Tidak perlu verifikasi email. Anda bisa langsung masuk dan melengkapi profil usaha.</p>
-                </div>
-            </div>
+           
 
             <form method="POST" action="{{ route('register') }}" class="space-y-4">
                 @csrf

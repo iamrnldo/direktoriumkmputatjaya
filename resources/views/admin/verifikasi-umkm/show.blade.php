@@ -91,6 +91,23 @@
                         </div>
                         @endif
                     </div>
+                    <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                        <p class="mb-3 text-xs font-bold uppercase tracking-wide text-amber-800">Data pribadi pemilik · hanya untuk admin</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 mb-1">NIK Pemilik</p>
+                                <p class="font-semibold text-slate-800">{{ $umkm->owner_nik ?: 'Belum diisi' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 mb-1">RT Alamat Pemilik</p>
+                                <p class="font-semibold text-slate-800">{{ $umkm->owner_rt ?: 'Belum diisi' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold text-slate-500 mb-1">RW Alamat Pemilik</p>
+                                <p class="font-semibold text-slate-800">{{ $umkm->owner_rw ?: 'Belum diisi' }}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

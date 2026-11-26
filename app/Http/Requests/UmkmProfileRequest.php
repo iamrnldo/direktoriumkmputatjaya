@@ -17,6 +17,9 @@ class UmkmProfileRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:umkm_categories,id'],
             'owner_name' => ['required', 'string', 'max:255'],
+            'owner_nik' => ['nullable', 'digits:16'],
+            'owner_rt' => ['nullable', 'regex:/^\\d{1,3}$/'],
+            'owner_rw' => ['nullable', 'regex:/^\\d{1,3}$/'],
             'business_description' => ['nullable', 'string', 'max:2000'],
             'address' => ['required', 'string', 'max:500'],
             'village' => ['nullable', 'string', 'max:100'],
@@ -35,6 +38,8 @@ class UmkmProfileRequest extends FormRequest
             'marketplace_url' => ['nullable', 'url', 'max:500'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'images' => ['sometimes', 'array', 'max:10'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ];
     }
 
@@ -46,12 +51,19 @@ class UmkmProfileRequest extends FormRequest
             'category_id.required' => 'Kategori usaha wajib dipilih.',
             'category_id.exists' => 'Kategori yang dipilih tidak valid.',
             'owner_name.required' => 'Nama pemilik wajib diisi.',
+            'owner_nik.digits' => 'NIK pemilik harus tepat 16 digit angka.',
+            'owner_rt.regex' => 'RT harus berisi 1 sampai 3 digit angka.',
+            'owner_rw.regex' => 'RW harus berisi 1 sampai 3 digit angka.',
             'address.required' => 'Alamat usaha wajib diisi.',
             'whatsapp_number.required' => 'Nomor WhatsApp wajib diisi.',
             'whatsapp_number.regex' => 'Format nomor WhatsApp tidak valid.',
             'business_email.email' => 'Format email tidak valid.',
             'latitude.between' => 'Latitude harus antara -90 dan 90.',
             'longitude.between' => 'Longitude harus antara -180 dan 180.',
+            'images.max' => 'Maksimal 10 foto dapat diunggah sekaligus.',
+            'images.*.image' => 'File galeri harus berupa gambar yang valid.',
+            'images.*.mimes' => 'Format gambar harus JPG, JPEG, PNG, atau WEBP.',
+            'images.*.max' => 'Ukuran setiap foto maksimal 5 MB.',
         ];
     }
 }

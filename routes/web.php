@@ -142,6 +142,7 @@ Route::prefix('admin')
 
         // Products
         Route::resource('produk', Admin\ProductController::class);
+        Route::delete('/produk/{produk}/gambar/{image}', [Admin\ProductController::class, 'deleteImage'])->name('produk.gambar.destroy');
         Route::post('/produk/{product}/toggle-featured', [Admin\ProductController::class, 'toggleFeatured'])->name('produk.toggle-featured');
 
         // Featured

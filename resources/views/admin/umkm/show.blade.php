@@ -38,6 +38,14 @@
                         <span class="text-slate-400">Alamat:</span>
                         <span class="text-slate-700 ml-2">{{ $umkm->address }}</span>
                     </div>
+                    <div class="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                        <p class="mb-1 text-xs font-bold uppercase tracking-wide text-amber-800">Data pribadi pemilik · hanya admin</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div><span class="text-slate-500">NIK:</span> <span class="font-medium text-slate-800">{{ $umkm->owner_nik ?: 'Belum diisi' }}</span></div>
+                            <div><span class="text-slate-500">RT:</span> <span class="font-medium text-slate-800">{{ $umkm->owner_rt ?: '—' }}</span></div>
+                            <div><span class="text-slate-500">RW:</span> <span class="font-medium text-slate-800">{{ $umkm->owner_rw ?: '—' }}</span></div>
+                        </div>
+                    </div>
                     <div>
                         <span class="text-slate-400">WhatsApp:</span>
                         <a href="{{ $umkm->whatsapp_link }}" target="_blank" class="text-emerald-600 font-medium ml-2 hover:underline">{{ $umkm->whatsapp_number }}</a>

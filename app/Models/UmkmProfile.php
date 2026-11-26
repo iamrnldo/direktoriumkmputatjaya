@@ -26,7 +26,7 @@ class UmkmProfile extends Model
     const STATUS_NONAKTIF = 'nonaktif';
 
     protected $fillable = [
-        'user_id', 'category_id', 'name', 'slug', 'owner_name',
+        'user_id', 'category_id', 'name', 'slug', 'owner_name', 'owner_nik', 'owner_rt', 'owner_rw',
         'business_description', 'address', 'village', 'district',
         'city', 'province', 'postal_code', 'whatsapp_number',
         'business_email', 'website_url', 'instagram_url', 'facebook_url',

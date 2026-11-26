@@ -14,9 +14,10 @@ class MapController extends Controller
     public function index()
     {
         $center = $this->mapService->getDefaultCenter();
-        $categories = UmkmCategory::active()->orderBy('sort_order')->get();
+        $categories = UmkmCategory::orderBy('sort_order')->get();
         $stats = $this->stats->getAdminDashboardStats();
+        $geoJson = $this->mapService->getGeoJson(includeInactive: true);
 
-        return view('admin.peta-umkm', compact('center', 'categories', 'stats'));
+        return view('admin.peta-umkm', compact('center', 'categories', 'stats', 'geoJson'));
     }
 }
